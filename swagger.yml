@@ -1,0 +1,242 @@
+swagger: '2.0'
+info:
+  version: "0.0.1"
+  title: Toggle API
+consumes:
+- application/json
+produces:
+- application/json
+tags:
+- name: public
+paths:
+  /toggles:
+    get:
+      tags: [public]
+      security:
+      - {public: []}
+      - {jwt: []}
+      responses:
+        200:
+          description: Get a list of toggles
+          schema:
+            $ref: "#/definitions/Toggles"
+        default:
+          $ref: '#/responses/default'
+    post:
+      security: [{jwt: []}]
+      responses:
+        200:
+            description: Create a toggle
+            schema:
+              $ref: "#/definitions/Toggle"
+  /toggles/{toggleId}/users:
+    parameters:
+    - $ref: '#/parameters/toggleId'
+    get:
+      security: [{jwt: []}]
+      responses:
+        200:
+          description: Get users that have a rule for a toggle
+          schema:
+            $ref: "#/definitions/Users"
+  /users:
+    get:
+      security:
+      - {jwt: []}
+      responses:
+        200:
+          description: Get a list of users
+          schema:
+            $ref: "#/definitions/Users"
+    post:
+      security:
+      - {jwt: []}
+      responses:
+        200:
+          description: Create a user
+          schema:
+            $ref: "#/definitions/User"
+  /users/{userId}:
+    parameters:
+    - $ref: '#/parameters/userId'
+    get:
+      security:
+      - {jwt: []}
+      responses:
+        200:
+          description: Get user specific information
+          schema:
+            $ref: "#/definitions/User"
+  /users/{userId}/toggles:
+    parameters:
+    - $ref: '#/parameters/userId'
+    get:
+      tags: [public]
+      security:
+      - {public: []}
+      - {jwt: []}
+      responses:
+        200:
+          description: Get user specific information
+          schema:
+            $ref: "#/definitions/OptionSelections"
+  /users/{userId}/groups:
+    parameters:
+    - $ref: '#/parameters/userId'
+    get:
+      security: [{jwt: []}]
+      responses:
+        200:
+          description: Get the groups a user is in
+          schema:
+            $ref: "#/definitions/Groups"
+  /groups:
+    get:
+      security: [{jwt: []}]
+      responses:
+        200:
+          description: Get a list of groups
+          schema:
+            $ref: "#/definitions/Groups"
+  /groups/{groupId}/users:
+    parameters:
+    - $ref: '#/parameters/groupId'
+    get:
+      security: [{jwt: []}]
+      responses:
+        200:
+          description: Show a group's users
+          schema:
+            $ref: "#/definitions/Users"
+    post:
+      security: [{jwt: []}]
+      responses:
+        200:
+          description: Add a user to a group
+          schema:
+            $ref: "#/definitions/AddUser"
+  /groups/{groupId}/users/{userId}:
+    parameters:
+    - $ref: '#/parameters/groupId'
+    - $ref: '#/parameters/userId'
+    delete:
+      security: [{jwt: []}]
+      responses:
+        204:
+          description: Remove user from the group
+
+parameters:
+  userId:
+    name: userId
+    in: path
+    required: true
+    type: string
+  toggleId:
+    name: toggleId
+    in: path
+    required: true
+    type: string
+  groupId:
+    name: groupId
+    in: path
+    required: true
+    type: string
+
+responses:
+  default:
+    description: unexpected error
+    schema:
+      $ref: '#/definitions/Error'
+
+securityDefinitions:
+  public:
+    type: apiKey
+    description: |
+      When only a public key is provided by the client only public data and enpoints will be accessable
+    name: ''
+    in: header
+  jwt:
+    type: apiKey
+    description: |
+      A JWT token to authorize requests. In the format "Authorization: Bearer &lt;token&gt;"
+    name: Authorization
+    in: header
+
+definitions:
+  Toggle:
+    required:
+    - Id
+    - Description
+    - Options
+    properties:
+      Id:
+        type: string
+      Description:
+        type: string
+      SelectionAlgorithm:
+        type: string
+      EnableInVersions:
+        type: string
+      Options:
+        type: array
+        items:
+          $ref: "#/definitions/ToggleOption"
+  Toggles:
+    type: array
+    items:
+      $ref: "#/definitions/Toggle"
+  ToggleOption:
+    required:
+    - Value
+    - Cutoff
+    properties:
+      Value:
+        type: string
+      Cutoff:
+        type: number
+        format: float
+  User:
+    required:
+    - Id
+    - Description
+    properties:
+      Id:
+        type: string
+      Description:
+        type: string
+  AddUser:
+    required:
+    - Id
+    properties:
+      Id:
+        type: string
+  Users:
+    type: array
+    items:
+      $ref: "#/definitions/User"
+  OptionSelection:
+    properties:
+      ToggleId:
+        type: string
+      OptionValue:
+        type: string
+  OptionSelections:
+    type: array
+    items:
+      $ref: "#/definitions/OptionSelection"
+  Group:
+    properties:
+      Id:
+        type: string
+      Description:
+        type: string
+  Groups:
+    type: array
+    items:
+      $ref: "#/definitions/Group"
+  Error:
+    properties:
+      Code:
+        type: string
+      Message:
+        type: string
