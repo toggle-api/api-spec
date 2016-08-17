@@ -67,7 +67,7 @@ paths:
           description: Get user specific information
           schema:
             $ref: "#/definitions/User"
-  /users/{userId}/toggles:
+  /users/{userId}/selections:
     parameters:
     - $ref: '#/parameters/userId'
     get:
