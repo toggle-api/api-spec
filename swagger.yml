@@ -215,6 +215,9 @@ definitions:
     items:
       $ref: "#/definitions/User"
   OptionSelection:
+    required:
+    - ToggleId
+    - OptionValue
     properties:
       ToggleId:
         type: string
@@ -225,6 +228,9 @@ definitions:
     items:
       $ref: "#/definitions/OptionSelection"
   Group:
+    required:
+    - Id
+    - Name
     properties:
       Id:
         type: string
